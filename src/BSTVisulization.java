@@ -7,8 +7,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.PixelInterleavedSampleModel;
+import java.util.Stack;
 
-public class BSTVisulization extends JFrame implements ActionListener, KeyListener {
+import static jdk.internal.misc.OSEnvironment.initialize;
+
+public class BSTVisulization extends JFrame {
     private Node root;
     private JPanel topPanel, treePanel, infoPanel;
     private JPanel topLeftPanel, topRightPanel;
@@ -31,7 +34,7 @@ public class BSTVisulization extends JFrame implements ActionListener, KeyListen
             Node right;
             Points p;
 
-            Node( int info){
+            Node(int info){
             data = new JLabel(info + "", SwingConstants.CENTER);
             data.setFont(new Font("Arial", Font.BOLD, 20));
             data.setBorder(BorderFactory.createLineBorder(Color.black));
@@ -81,6 +84,51 @@ public class BSTVisulization extends JFrame implements ActionListener, KeyListen
                 public String toString() {
                     return Integer.toString(this.root);
             }
+        }
+
+        public void paint(Graphics g){
+        super.paintComponents(g);
+
+        g2= (Graphics2D) g;
+        g2.setStroke(new BasicStroke(3.0f));
+
+            Stack<Node> s = new Stack<>();
+            Node curr = root;
+            Points pts;
+            int offset = topPanel.getBounds().height;
+
+            while (!s.isEmpty() || curr != null){
+                while(curr != null){
+                    s.push(curr);
+                    curr = curr.left;
+                }
+                if (!s.isEmpty())
+                    curr = s.pop();
+                pts = curr.p;
+                g2.drawLine(pts.x1+7,pts.y1+30+offset,pts.x2+3,pts.y2+10+offset);
+                curr=curr.right;
+            }
+        }
+
+        public BSTVisulization(){
+        initialize();
+        }
+
+        private void initialize(){
+        setSize(1300,700);
+
+        size = getBounds();
+        x = size.width/2;
+
+        topPanel = new JPanel(new BorderLayout());
+        Rectangle top = topPanel.getBounds();
+
+        topLeftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT,10,10));
+        topPanel.add(topLeftPanel,BorderLayout.WEST);
+
+        topRightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        topPanel.add(topRightPanel,BorderLayout.EAST);
+
         }
     }
 
